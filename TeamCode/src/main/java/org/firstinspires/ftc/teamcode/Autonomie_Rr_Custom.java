@@ -1,10 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.BezierCurveGenerating.CubicCurve;
+import static org.firstinspires.ftc.teamcode.BezierCurveGenerator.CubicCurve;
+
+import static utils.Constants.BASE;
+import static utils.Constants.Forward_Offset;
+import static utils.Constants.Horizontal_Offset;
+import static utils.Constants.WHEEL_RADIUS;
+import static utils.Constants.X_Multiplier;
+import static utils.Constants.Y_Multiplier;
+import static utils.Mathematics.encoderTicksToCms;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -32,16 +39,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode
     private Encoder leftEnc = null,
             rightEnc = null,
             midEnc = null;
-
-    private  final double Horizontal_Offset = 21.2,  //cm
-            Forward_Offset = -5.5;  //cm
-
-    private  final double    WHEEL_DIAMETER = 3.5; //cm roata odo
-    private  final double    TICKS_PER_REV = 8192;
-    private  final double    BASE = 21;
-    private final double WHEEL_RADIUS = 9.6;//cm Mecanum
-    private final double    X_Multiplier = 1.01416,
-                            Y_Multiplier = 1.0686;
     private double Pos_X = 0;
     private double Pos_Y = 0;
     private double angle = 0;
@@ -100,18 +97,10 @@ public class Autonomie_Rr_Custom extends LinearOpMode
         angle = 0;
         //START
 
-        Points A = new Points();
-        Points B = new Points();
-        Points C = new Points();
-        Points D = new Points();
-        A.X = 0;
-        A.Y = 0;
-        B.X = 0;
-        B.Y = 100;
-        C.X = -4;
-        C.Y = 100;
-        D.X = 50;
-        D.Y = 100;
+        Point A = new Point(0 , 0);
+        Point B = new Point(0, 100);
+        Point C = new Point(-4, 100);
+        Point D = new Point(50, 100);
         List<Pose2d> traj= CubicCurve(A, B, C, D,10);
         waitForStart();
         timer.reset();
@@ -155,9 +144,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode
         Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
         angle += dtheta;
         current_point = new Pose2d(Pos_X,Pos_Y,angle);
-    }
-    private double encoderTicksToCms(double ticks) {
-        return WHEEL_DIAMETER * Math.PI * ticks / TICKS_PER_REV;
     }
     private void PathRunner(List<Pose2d> Trajectory)
     {

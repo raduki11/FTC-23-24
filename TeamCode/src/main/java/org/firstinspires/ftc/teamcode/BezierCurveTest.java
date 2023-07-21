@@ -9,19 +9,14 @@ import java.util.List;
 @TeleOp(name = "Curve test")
 public class BezierCurveTest extends LinearOpMode
 {
-    Points A = new Points(), B  = new Points(), C = new Points(), D = new Points();
     @Override
     public void runOpMode() throws InterruptedException {
-        A.X = 0;
-        A.Y = 0;
-        B.X = 0;
-        B.Y = 100;
-        C.X = -4;
-        C.Y = 100;
-        D.X = 50;
-        D.Y = 100;
+        Point A = new Point(0 , 0);
+        Point B = new Point(0, 100);
+        Point C = new Point(-4, 100);
+        Point D = new Point(50, 100);
         List<Pose2d> Traj = new ArrayList<>();
-        Traj = BezierCurveGenerating.CubicCurve(A,B,C,D,10);
+        Traj = BezierCurveGenerator.CubicCurve(A,B,C,D,10);
         telemetry.addLine("Gata");
         telemetry.update();
         waitForStart();
