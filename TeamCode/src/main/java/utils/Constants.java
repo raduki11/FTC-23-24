@@ -10,7 +10,7 @@ public class Constants {
     public static final double WHEEL_RADIUS = 9.6;//cm Mecanum
     public static final double      X_Multiplier = 1.01416,
                                     Y_Multiplier = 1.0686;
-    public static double kP_posX = 0.3, kI_posX = 0, kD_posX = 0.08,
-            kP_posY = 0.3, kI_posY = 0, kD_posY = 0.08,
-            kP_heading = 0.1, kI_heading = 0, kD_heading = 0;  //ToDo coeficienti PID
+    public static double kP_posX = 0.4, kI_posX = 0, kD_posX = 0.08,
+            kP_posY = 0.4, kI_posY = 0, kD_posY = 0.08,
+            kP_heading = 0.4, kI_heading = 0, kD_heading = 0;  //ToDo coeficienti PID
 }

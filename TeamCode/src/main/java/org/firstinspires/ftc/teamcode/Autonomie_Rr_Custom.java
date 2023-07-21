@@ -31,7 +31,7 @@ import java.util.List;
 public class Autonomie_Rr_Custom extends LinearOpMode {
 
     private double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
-    private double const_pow = 0.1;
+    private double const_pow = 0;
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
     private DcMotorEx LFM = null;
@@ -94,9 +94,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         leftEnc.reset();
         rightEnc.reset();
         midEnc.reset();
-        Pos_X = 0;
-        Pos_Y = 0;
-        angle = 0;
         //START
 
         Point A = new Point(0, 0);
@@ -107,9 +104,12 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         waitForStart();
         timer.reset();
         isBusy = true;
+        Pos_X = 0;
+        Pos_Y = 0;
+        angle = 0;
         while (opModeIsActive()) {
             updateOdometryPos();
-            goToPoint(new Pose2d(100, 0, Math.toRadians(0)));
+            goToPoint(new Pose2d(100, -100, Math.toRadians(0)));
             TelemetryPos();
         }
     }
@@ -143,6 +143,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         Pos_X += dx * Math.cos(angle) - dy * Math.sin(angle);
         Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
         angle += dtheta;
+
         current_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
@@ -166,32 +167,34 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         double error_X = target_point.getX() - current_point.getX();
         double error_Y = target_point.getY() - current_point.getY();
 
-        double P_X = kP_posX * error_X;
-        double P_Y = kP_posY * error_Y;
-        double P_heading = kP_heading * curr_error_heading;
+        if(error_X <= 5 || error_Y <= 5 || curr_error_heading <=1) {
+            double P_X = kP_posX * error_X;
+            double P_Y = kP_posY * error_Y;
+            double P_heading = kP_heading * curr_error_heading;
 
-        curr_time = timer.seconds();
-        double D_X = kD_posX * (error_X - prev_error_X) / (curr_time - prev_time);
-        double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
-        double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
+            curr_time = timer.seconds();
+            double D_X = kD_posX * (error_X - prev_error_X) / (curr_time - prev_time);
+            double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
+            double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
 
-        double correction_X = P_X + D_X;
-        double correction_Y = P_Y + D_Y;
-        double correction_heading = P_heading + D_heading;
+            double correction_X = P_X + D_X;
+            double correction_Y = P_Y + D_Y;
+            double correction_heading = P_heading + D_heading;
 
-        prev_error_X = error_X;
-        prev_error_Y = error_Y;
-        prev_error_heading = curr_error_heading;
-        prev_time = curr_time;
+            prev_error_X = error_X;
+            prev_error_Y = error_Y;
+            prev_error_heading = curr_error_heading;
+            prev_time = curr_time;
 
-        double vFL = correction_X - correction_Y - (BASE * correction_heading),
-                vBL = correction_X + correction_Y - (BASE * correction_heading),
-                vBR = correction_X - correction_Y + (BASE * correction_heading),
-                vFR = correction_X + correction_Y + (BASE * correction_heading);
-        LFM.setPower(const_pow + vFL / WHEEL_RADIUS);
-        LBM.setPower(const_pow + vBL / WHEEL_RADIUS);
-        RFM.setPower(const_pow + vFR / WHEEL_RADIUS);
-        RBM.setPower(const_pow + vBR / WHEEL_RADIUS);
+            double vFL = correction_X - correction_Y - (BASE * correction_heading),
+                    vBL = correction_X + correction_Y - (BASE * correction_heading),
+                    vBR = correction_X - correction_Y + (BASE * correction_heading),
+                    vFR = correction_X + correction_Y + (BASE * correction_heading);
+            LFM.setPower(const_pow + vFL / WHEEL_RADIUS);
+            LBM.setPower(const_pow + vBL / WHEEL_RADIUS);
+            RFM.setPower(const_pow + vFR / WHEEL_RADIUS);
+            RBM.setPower(const_pow + vBR / WHEEL_RADIUS);
+        }
     }
 
     void TelemetryPos() {
