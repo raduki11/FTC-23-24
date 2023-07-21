@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(name="Pozitie", group="Iterative Opmode")
 public class OdometryTest extends LinearOpMode {
-    public static double    Pos_X = 0,
-                            Pos_Y =0,
-                            heading = 0;
+    private double      Pos_X = 0,
+                        Pos_Y =0,
+                        heading = 0;
     private DcMotorEx RBM = null;
     private DcMotorEx LFM = null;
     private DcMotorEx RFM = null;
