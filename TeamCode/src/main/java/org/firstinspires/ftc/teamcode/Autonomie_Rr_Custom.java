@@ -144,7 +144,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode
 
         delta_LeftEncPos = curr_LeftEncPos - prev_LeftEncPos;
         delta_RightEncPos = curr_RightEncPos - prev_RightEncPos;
-        delta_MidEncPos = curr_MidEncPos - prev_MidEncPos;
+        //delta_MidEncPos = curr_MidEncPos - prev_MidEncPos;
 
         double dtheta = (delta_RightEncPos - delta_LeftEncPos) / Horizontal_Offset;
         double dx = (delta_LeftEncPos + delta_RightEncPos) / 2.0;
