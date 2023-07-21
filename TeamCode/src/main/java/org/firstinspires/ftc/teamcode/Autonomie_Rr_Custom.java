@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.BezierCurveGenerator.CubicCurve;
-
 import static utils.Constants.BASE;
 import static utils.Constants.Forward_Offset;
 import static utils.Constants.Horizontal_Offset;
@@ -11,6 +10,7 @@ import static utils.Constants.Y_Multiplier;
 import static utils.Constants.kD_heading;
 import static utils.Constants.kD_posX;
 import static utils.Constants.kD_posY;
+import static utils.Constants.kF;
 import static utils.Constants.kP_heading;
 import static utils.Constants.kP_posX;
 import static utils.Constants.kP_posY;
@@ -20,9 +20,10 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
 @Autonomous(name = "Test capacitate", group = "Autonomus")
 public class Autonomie_Rr_Custom extends LinearOpMode {
 
+    VoltageSensor battery;
     private double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
     private double const_pow = 0;
     ElapsedTime timer = new ElapsedTime();
@@ -63,8 +65,13 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     int go = 1;
     boolean isBusy = false;
 
+    public Autonomie_Rr_Custom() throws RobotCoreException, InterruptedException {
+    }
+
     @Override
     public void runOpMode() throws InterruptedException {
+        battery = hardwareMap.get(VoltageSensor.class, "Control Hub");
+
         LBM = hardwareMap.get(DcMotorEx.class, "LBM");
         RBM = hardwareMap.get(DcMotorEx.class, "RBM");
         LFM = hardwareMap.get(DcMotorEx.class, "LFM");
@@ -166,8 +173,9 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         double curr_error_heading = target_point.getHeading() - current_point.getHeading(); // distance between actual si target
         double error_X = target_point.getX() - current_point.getX();
         double error_Y = target_point.getY() - current_point.getY();
+        double voltage = battery.getVoltage();
 
-        if(error_X <= 5 || error_Y <= 5 || curr_error_heading <=1) {
+        if(error_X >= 2 || error_Y >= 2 || curr_error_heading >=1) {
             double P_X = kP_posX * error_X;
             double P_Y = kP_posY * error_Y;
             double P_heading = kP_heading * curr_error_heading;
@@ -177,9 +185,11 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
             double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
             double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
 
-            double correction_X = P_X + D_X;
-            double correction_Y = P_Y + D_Y;
-            double correction_heading = P_heading + D_heading;
+            double F = kF * voltage;
+
+            double correction_X = P_X + D_X + F;
+            double correction_Y = P_Y + D_Y + F;
+            double correction_heading = P_heading + D_heading + F;
 
             prev_error_X = error_X;
             prev_error_Y = error_Y;
@@ -190,10 +200,11 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
                     vBL = correction_X + correction_Y - (BASE * correction_heading),
                     vBR = correction_X - correction_Y + (BASE * correction_heading),
                     vFR = correction_X + correction_Y + (BASE * correction_heading);
-            LFM.setPower(const_pow + vFL / WHEEL_RADIUS);
-            LBM.setPower(const_pow + vBL / WHEEL_RADIUS);
-            RFM.setPower(const_pow + vFR / WHEEL_RADIUS);
-            RBM.setPower(const_pow + vBR / WHEEL_RADIUS);
+
+            LFM.setPower(vFL / WHEEL_RADIUS );
+            LBM.setPower(vBL / WHEEL_RADIUS);
+            RFM.setPower(vFR / WHEEL_RADIUS);
+            RBM.setPower(vBR / WHEEL_RADIUS);
         }
     }
 
