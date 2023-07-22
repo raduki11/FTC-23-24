@@ -78,9 +78,6 @@ public class Encoder{
         this.direction = direction;
     }
 
-    public void reset() {
-        lastPosition =0;
-    }
     /**
      * Gets the position from the underlying motor and adjusts for the set direction.
      * Additionally, this method updates the velocity estimates used for compensated velocity

@@ -45,8 +45,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     private double Pos_X = 0;
     private double Pos_Y = 0;
     private double angle = 0;
-    private double Field_X = 0;
-    private double Field_Y = 0;
     Pose2d current_point = new Pose2d(0, 0, 0);
     private double curr_LeftEncPos = 0,
             curr_RightEncPos = 0,
@@ -96,11 +94,8 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
 
         leftEnc.setDirection(Encoder.Direction.FORWARD);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.FORWARD);
+        midEnc.setDirection(Encoder.Direction.REVERSE);
 
-        leftEnc.reset();
-        rightEnc.reset();
-        midEnc.reset();
         //START
 
         Point A = new Point(0, 0);
@@ -116,7 +111,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         angle = 0;
         while (opModeIsActive()) {
             updateOdometryPos();
-            goToPoint(new Pose2d(100, -100, Math.toRadians(0)));
+            goToPoint(new Pose2d(100, 100, Math.toRadians(0)));
             TelemetryPos();
         }
     }
@@ -131,7 +126,8 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         curr_MidEncPos = encoderTicksToCms(MidPos) * Y_Multiplier;
     }
 
-    private void updateOdometryPos() {
+    private void updateOdometryPos()
+    {
         prev_LeftEncPos = curr_LeftEncPos;
         prev_RightEncPos = curr_RightEncPos;
         prev_MidEncPos = curr_MidEncPos;
@@ -146,12 +142,11 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         double dx = (delta_LeftEncPos + delta_RightEncPos) / 2.0;
         double dy = delta_MidEncPos - dtheta * Forward_Offset;
 
-        //double theta = angle + (dtheta / 2.0);
-        Pos_X += dx * Math.cos(angle) - dy * Math.sin(angle);
-        Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
+        double theta = angle + (dtheta / 2.0);
+        Pos_X += dx * Math.cos(theta) - dy * Math.sin(theta);
+        Pos_Y += dy * Math.cos(theta) + dx * Math.sin(theta);
         angle += dtheta;
-
-        current_point = new Pose2d(Pos_X, Pos_Y, angle);
+        current_point = new Pose2d(Pos_X,Pos_Y,angle);
     }
 
     private void PathRunner(List<Pose2d> Trajectory) {
@@ -201,7 +196,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
                     vBR = correction_X - correction_Y + (BASE * correction_heading),
                     vFR = correction_X + correction_Y + (BASE * correction_heading);
 
-            LFM.setPower(vFL / WHEEL_RADIUS );
+            LFM.setPower(vFL / WHEEL_RADIUS);
             LBM.setPower(vBL / WHEEL_RADIUS);
             RFM.setPower(vFR / WHEEL_RADIUS);
             RBM.setPower(vBR / WHEEL_RADIUS);

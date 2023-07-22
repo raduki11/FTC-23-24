@@ -1,7 +1,7 @@
 package utils;
 
 import static utils.Constants.TICKS_PER_REV;
-import static utils.Constants.WHEEL_DIAMETER;
+import static utils.Constants.WHEEL_RADIUS_ODO;
 
 import org.firstinspires.ftc.teamcode.Point;
 
@@ -15,6 +15,6 @@ public class Mathematics {
         return Math.atan2(dy, dx);
     }
     public static double encoderTicksToCms(double ticks) {
-        return WHEEL_DIAMETER * Math.PI * ticks / TICKS_PER_REV;
+        return 2.0 * WHEEL_RADIUS_ODO * Math.PI * ticks / TICKS_PER_REV;
     }
 }

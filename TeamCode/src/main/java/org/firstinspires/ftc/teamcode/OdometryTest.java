@@ -1,8 +1,20 @@
 package org.firstinspires.ftc.teamcode;
 
+import static utils.Constants.Forward_Offset;
+import static utils.Constants.Horizontal_Offset;
+import static utils.Constants.X_Multiplier;
+import static utils.Constants.Y_Multiplier;
+import static utils.Mathematics.encoderTicksToCms;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp(name="Pozitie", group="Iterative Opmode")
 public class OdometryTest extends LinearOpMode {
@@ -14,20 +26,12 @@ public class OdometryTest extends LinearOpMode {
     private DcMotorEx RFM = null;
     private DcMotorEx LBM = null;
 
-    //Telemetry telemetry= FtcDashboard.getInstance().getTelemetry();
+    Telemetry telemetry= FtcDashboard.getInstance().getTelemetry();
 
     private Encoder leftEnc = null,
             rightEnc = null,
             midEnc = null;
 
-    private  final double Horizontal_Offset = 21.2,  //cm
-            Forward_Offset = -5.5;  //cm
-
-    private  final double    WHEEL_DIAMETER = 3.5; //cm
-    private  final double    TICKS_PER_REV = 8192;
-
-    private final double    X_Multiplier = 1.01416,
-                            Y_Multiplier = 1.0686;
     private double angle = 0;
     private double  r0 =0,
                     r1 = 0;
@@ -45,6 +49,9 @@ public class OdometryTest extends LinearOpMode {
             delta_MidEncPos = 0;
     private double  Pos_X_last = 0;
     private double Pos_Y_last = 0;
+
+    BNO055IMU imu ;
+    Orientation angles;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -65,7 +72,15 @@ public class OdometryTest extends LinearOpMode {
         RBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
          */
-
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit            = BNO055IMU.AngleUnit.RADIANS;
+        parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile  = "BNo055IMUCalibration.json";
+        parameters.loggingEnabled       = true;
+        parameters.loggingTag           = "IMU";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         leftEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RBM"));
         rightEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RFM"));
@@ -114,9 +129,6 @@ public class OdometryTest extends LinearOpMode {
          RFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          RBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
          */
-        leftEnc.reset();
-        rightEnc.reset();
-        midEnc.reset();
         Pos_X_last = 0;
         Pos_Y_last = 0;
         Pos_X = 0;
@@ -148,7 +160,6 @@ public class OdometryTest extends LinearOpMode {
 
         //Calcul deplasare
         double delta_heading = (delta_LeftEncPos - delta_RightEncPos) / Horizontal_Offset;
-        //double heading = (curr_LeftEncPos - curr_RightEncPos) / Horizontal_Offset;
         double forward = (delta_RightEncPos + delta_LeftEncPos) / 2.0;
         double strafe = delta_MidEncPos - delta_heading * Forward_Offset;
 
@@ -164,11 +175,13 @@ public class OdometryTest extends LinearOpMode {
         double rel_x = r0 * Math.sin(delta_heading) - r1 * (1- Math.cos(delta_heading));
         double rel_y = r1 * Math.sin(delta_heading) + r0 * (1- Math.cos(delta_heading));
 
-        Pos_X += rel_x * Math.cos(delta_heading) - rel_y * Math.sin(delta_heading);
-        Pos_Y += rel_y * Math.cos(delta_heading) + rel_x * Math.sin(delta_heading);
-        angle += delta_heading;
+        angles =  imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.RADIANS);
+        Pos_X += rel_x * Math.cos(angles.firstAngle) - rel_y * Math.sin(angles.firstAngle);
+        Pos_Y += rel_y * Math.cos(angles.firstAngle) + rel_x * Math.sin(angles.firstAngle);
+        //angle += delta_heading;
     }
     */
+
     private void updateOdometryPos()
     {
         prev_LeftEncPos = curr_LeftEncPos;
@@ -186,20 +199,16 @@ public class OdometryTest extends LinearOpMode {
         double dy = delta_MidEncPos - dtheta * Forward_Offset;
 
         //double theta = angle + (dtheta / 2.0);
-        Pos_X += dx * Math.cos(angle) - dy * Math.sin(angle);
-        Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
+        Pos_X += (dx * Math.cos(angle) - dy * Math.sin(angle));
+        Pos_Y += (dy * Math.cos(angle) + dx * Math.sin(angle));
         angle += dtheta;
     }
 
-    private double encoderTicksToCms(double ticks) {
-        return WHEEL_DIAMETER * Math.PI * ticks / TICKS_PER_REV;
-    }
-    /**
+
     private double RealAngle(double angle)
     {
         if(angle>=360||angle<=-360)angle=0;
         return angle;
     }
-     */
 }
 
