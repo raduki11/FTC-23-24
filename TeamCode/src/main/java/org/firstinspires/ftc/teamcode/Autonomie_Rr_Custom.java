@@ -62,7 +62,10 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     private int wayPoint = 0;
     int go = 1;
     boolean isBusy = false;
-
+    boolean isClose = false;
+    boolean isDone = false;
+    boolean Done = false;
+    Pose2d target = new Pose2d();
     public Autonomie_Rr_Custom() throws RobotCoreException, InterruptedException {
     }
 
@@ -94,7 +97,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
 
         leftEnc.setDirection(Encoder.Direction.FORWARD);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.REVERSE);
+        midEnc.setDirection(Encoder.Direction.FORWARD);
 
         //START
 
@@ -105,13 +108,13 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         List<Pose2d> traj = CubicCurve(A, B, C, D, 10);
         waitForStart();
         timer.reset();
-        isBusy = true;
+        isBusy = false;
         Pos_X = 0;
         Pos_Y = 0;
         angle = 0;
         while (opModeIsActive()) {
             updateOdometryPos();
-            goToPoint(new Pose2d(100, 100, Math.toRadians(0)));
+            if(!Done)PathRunner(traj);
             TelemetryPos();
         }
     }
@@ -126,8 +129,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         curr_MidEncPos = encoderTicksToCms(MidPos) * Y_Multiplier;
     }
 
-    private void updateOdometryPos()
-    {
+    private void updateOdometryPos() {
         prev_LeftEncPos = curr_LeftEncPos;
         prev_RightEncPos = curr_RightEncPos;
         prev_MidEncPos = curr_MidEncPos;
@@ -146,20 +148,26 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         Pos_X += dx * Math.cos(theta) - dy * Math.sin(theta);
         Pos_Y += dy * Math.cos(theta) + dx * Math.sin(theta);
         angle += dtheta;
-        current_point = new Pose2d(Pos_X,Pos_Y,angle);
+        current_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
     private void PathRunner(List<Pose2d> Trajectory) {
-        if (isBusy) {
-            Pose2d pct = Trajectory.get(wayPoint).minus(current_point);
-            if (pct.getX() <= 4 && pct.getY() <= 4 && pct.getHeading() <= 1)
+        if (isClose) {
+            if (wayPoint + 1 < Trajectory.size()) {
                 wayPoint++;
-            if (wayPoint >= Trajectory.size()) {
-                isBusy = false;
-                wayPoint = 0;
+                isClose = false;
             } else
-                goToPoint(Trajectory.get(wayPoint));
+                isDone = true;
         }
+        if (!isBusy) {
+            if(isDone)
+                Done = true;
+            else {
+                target = Trajectory.get(wayPoint);
+                isBusy = true;
+            }
+        }
+        goToPoint(target);
     }
 
     private void goToPoint(Pose2d target_point) {
@@ -170,37 +178,39 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         double error_Y = target_point.getY() - current_point.getY();
         double voltage = battery.getVoltage();
 
-        if(error_X >= 2 || error_Y >= 2 || curr_error_heading >=1) {
-            double P_X = kP_posX * error_X;
-            double P_Y = kP_posY * error_Y;
-            double P_heading = kP_heading * curr_error_heading;
+        if (error_X <= 5 && error_Y <= 5 && curr_error_heading <= 1)
+            isClose = true;
+        if (error_X <= 2 && error_Y <= 2 && curr_error_heading <= 0.5)
+            isBusy = false;
+        double P_X = kP_posX * error_X;
+        double P_Y = kP_posY * error_Y;
+        double P_heading = kP_heading * curr_error_heading;
 
-            curr_time = timer.seconds();
-            double D_X = kD_posX * (error_X - prev_error_X) / (curr_time - prev_time);
-            double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
-            double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
+        curr_time = timer.seconds();
+        double D_X = kD_posX * (error_X - prev_error_X) / (curr_time - prev_time);
+        double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
+        double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
 
-            double F = kF * voltage;
+        double F = kF * voltage;
 
-            double correction_X = P_X + D_X + F;
-            double correction_Y = P_Y + D_Y + F;
-            double correction_heading = P_heading + D_heading + F;
+        double correction_X = P_X + D_X + F;
+        double correction_Y = P_Y + D_Y + F;
+        double correction_heading = P_heading + D_heading + F;
 
-            prev_error_X = error_X;
-            prev_error_Y = error_Y;
-            prev_error_heading = curr_error_heading;
-            prev_time = curr_time;
+        prev_error_X = error_X;
+        prev_error_Y = error_Y;
+        prev_error_heading = curr_error_heading;
+        prev_time = curr_time;
 
-            double vFL = correction_X - correction_Y - (BASE * correction_heading),
-                    vBL = correction_X + correction_Y - (BASE * correction_heading),
-                    vBR = correction_X - correction_Y + (BASE * correction_heading),
-                    vFR = correction_X + correction_Y + (BASE * correction_heading);
+        double vFL = correction_X - correction_Y - (BASE * correction_heading),
+                vBL = correction_X + correction_Y - (BASE * correction_heading),
+                vBR = correction_X - correction_Y + (BASE * correction_heading),
+                vFR = correction_X + correction_Y + (BASE * correction_heading);
 
-            LFM.setPower(vFL / WHEEL_RADIUS);
-            LBM.setPower(vBL / WHEEL_RADIUS);
-            RFM.setPower(vFR / WHEEL_RADIUS);
-            RBM.setPower(vBR / WHEEL_RADIUS);
-        }
+        LFM.setPower(vFL / WHEEL_RADIUS);
+        LBM.setPower(vBL / WHEEL_RADIUS);
+        RFM.setPower(vFR / WHEEL_RADIUS);
+        RBM.setPower(vBR / WHEEL_RADIUS);
     }
 
     void TelemetryPos() {
