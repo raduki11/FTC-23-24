@@ -16,26 +16,20 @@ import static utils.Mathematics.encoderTicksToCms;
 
 import android.annotation.SuppressLint;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.List;
 
 @Config
 @Autonomous(name = "Test capacitate", group = "Autonomus")
 public class Autonomie_Rr_Custom extends LinearOpMode {
-
-    VoltageSensor battery;
     ElapsedTime test = new ElapsedTime();
     private double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
     private double const_pow = 0;
@@ -51,7 +45,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     private double Pos_Y = 0;
     private double angle = 0;
     Pose2d current_point = new Pose2d(0, 0, 0);
-    Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+    //Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private double curr_LeftEncPos = 0,
             curr_RightEncPos = 0,
             curr_MidEncPos = 0;
@@ -77,8 +71,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     @SuppressLint("SuspiciousIndentation")
     @Override
     public void runOpMode() throws InterruptedException {
-        battery = hardwareMap.get(VoltageSensor.class, "Control Hub");
-
         LBM = hardwareMap.get(DcMotorEx.class, "LBM");
         RBM = hardwareMap.get(DcMotorEx.class, "RBM");
         LFM = hardwareMap.get(DcMotorEx.class, "LFM");
@@ -134,7 +126,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
              test.reset();
              }
              */
-            goToPoint(new Pose2d(100, -100, Math.toRadians(0)), 0.2, 0);
+            goToPoint(new Pose2d(100, 0, Math.toRadians(0)), 0.2, 0);
             TelemetryPos();
         }
     }
@@ -202,10 +194,12 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
 
             double relX = Math.sin(relativeAngleToTarget) * dist;
             double relY = Math.cos(relativeAngleToTarget) * dist;
-            double rel_Turn = relativeAngleToTarget + target_point.getHeading();
+            double rel_Turn = relativeAngleToTarget + target_point.getHeading() - Math.toRadians(90);
 
-            double F_X = relX / (Math.abs(relX) + Math.abs(relY)) * movementSpeed;
-            double F_Y = relY / (Math.abs(relX) + Math.abs(relY)) * movementSpeed;
+            double nominator = Math.abs(relX) + Math.abs(relY);
+
+            double F_X = relX / nominator * movementSpeed;
+            double F_Y = relY / nominator * movementSpeed;
             double F_heading = Range.clip(rel_Turn / Math.toRadians(30), -1, 1) * turnSpeed;
 
             double mov_X = P_X + D_X + F_X;
@@ -228,32 +222,17 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         telemetry.update();
     }
 
-    /**
-     * double err_x = target_point.getX() - current_point.getX(),
-     * err_y = target_point.getY() - current_point.getY(),
-     * err_theta = target_point.getHeading() - current_point.getHeading();
-     * double theta = current_point.getHeading();
-     * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
-     * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
-     * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
-     * double since0;
-     * if(err_theta==0)since0 = Math.sin(err_theta);
-     * else
-     * since0 = Math.sin(err_theta) / err_theta;
-     * double vc = vd * Math.cos(err_theta) + k * ex;
-     * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
-     * <p>
-     * double vLeft = vc - w * rB;
-     * double vRight = vc + w * rB;
-     */
     public void setPowers(double LFM_pow, double LBM_pow, double RFM_pow, double RBM_pow) {
         double max_pow = Math.max(Math.max(RFM_pow, RBM_pow), Math.max(LFM_pow, LBM_pow));
+        if (max_pow == 0)
+            max_pow = 1;
         LFM.setPower(LFM_pow / max_pow);
         RFM.setPower(RFM_pow / max_pow);
         LBM.setPower(LBM_pow / max_pow);
         RBM.setPower(RBM_pow / max_pow);
     }
 }
+
 /**
  * if (Math.abs(curr_error_POS) < 10)
  * sumI_pos += curr_error_POS * (curr_time-prev_time);
@@ -270,4 +249,22 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
  * prev_error_POS = curr_error_POS;
  * prev_error_POS = curr_error_heading;
  * prev_time = curr_time;
+ */
+/**
+ * double err_x = target_point.getX() - current_point.getX(),
+ * err_y = target_point.getY() - current_point.getY(),
+ * err_theta = target_point.getHeading() - current_point.getHeading();
+ * double theta = current_point.getHeading();
+ * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+ * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+ * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+ * double since0;
+ * if(err_theta==0)since0 = Math.sin(err_theta);
+ * else
+ * since0 = Math.sin(err_theta) / err_theta;
+ * double vc = vd * Math.cos(err_theta) + k * ex;
+ * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+ * <p>
+ * double vLeft = vc - w * rB;
+ * double vRight = vc + w * rB;
  */
