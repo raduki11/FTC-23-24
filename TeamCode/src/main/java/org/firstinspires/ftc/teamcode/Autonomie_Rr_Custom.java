@@ -1,29 +1,33 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.BezierCurveGenerator.CubicCurve;
-import static utils.Constants.BASE;
 import static utils.Constants.Forward_Offset;
 import static utils.Constants.Horizontal_Offset;
-import static utils.Constants.WHEEL_RADIUS;
 import static utils.Constants.X_Multiplier;
 import static utils.Constants.Y_Multiplier;
-import static utils.Constants.kD_heading;
-import static utils.Constants.kD_posX;
-import static utils.Constants.kD_posY;
-import static utils.Constants.kF;
-import static utils.Constants.kP_heading;
-import static utils.Constants.kP_posX;
-import static utils.Constants.kP_posY;
+import static utils.Constants.kD_Heading;
+import static utils.Constants.kD_X;
+import static utils.Constants.kD_Y;
+import static utils.Constants.kP_Headng;
+import static utils.Constants.kP_X;
+import static utils.Constants.kP_Y;
+import static utils.Mathematics.AngleWrap;
 import static utils.Mathematics.encoderTicksToCms;
 
+import android.annotation.SuppressLint;
+
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.exception.RobotCoreException;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.List;
 
@@ -32,6 +36,7 @@ import java.util.List;
 public class Autonomie_Rr_Custom extends LinearOpMode {
 
     VoltageSensor battery;
+    ElapsedTime test = new ElapsedTime();
     private double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
     private double const_pow = 0;
     ElapsedTime timer = new ElapsedTime();
@@ -46,6 +51,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     private double Pos_Y = 0;
     private double angle = 0;
     Pose2d current_point = new Pose2d(0, 0, 0);
+    Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private double curr_LeftEncPos = 0,
             curr_RightEncPos = 0,
             curr_MidEncPos = 0;
@@ -65,10 +71,10 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     boolean isClose = false;
     boolean isDone = false;
     boolean Done = false;
+    int da = -1;
     Pose2d target = new Pose2d();
-    public Autonomie_Rr_Custom() throws RobotCoreException, InterruptedException {
-    }
 
+    @SuppressLint("SuspiciousIndentation")
     @Override
     public void runOpMode() throws InterruptedException {
         battery = hardwareMap.get(VoltageSensor.class, "Control Hub");
@@ -82,13 +88,11 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         RFM.setDirection(DcMotorEx.Direction.REVERSE);
         RBM.setDirection(DcMotorEx.Direction.REVERSE);
 
-        /**
-         LBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         LFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         RFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         RBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-         */
+        LBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
 
         leftEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RBM"));
@@ -108,13 +112,29 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         List<Pose2d> traj = CubicCurve(A, B, C, D, 10);
         waitForStart();
         timer.reset();
-        isBusy = false;
+        isBusy = true;
         Pos_X = 0;
         Pos_Y = 0;
         angle = 0;
+        current_point = new Pose2d(0, 0, 0);
         while (opModeIsActive()) {
             updateOdometryPos();
-            if(!Done)PathRunner(traj);
+            //if(!Done)PathRunner(traj);
+            /**
+             if(da==-1)
+             goToPoint(new Pose2d(100,0,0));
+             else
+             if(da == 1)
+             goToPoint(new Pose2d(0,0,0));
+             if(!isBusy)
+             {
+             isBusy = true;
+             da=-da;
+             sleep(500);
+             test.reset();
+             }
+             */
+            goToPoint(new Pose2d(100, -100, Math.toRadians(0)), 0.2, 0);
             TelemetryPos();
         }
     }
@@ -144,80 +164,94 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         double dx = (delta_LeftEncPos + delta_RightEncPos) / 2.0;
         double dy = delta_MidEncPos - dtheta * Forward_Offset;
 
-        double theta = angle + (dtheta / 2.0);
-        Pos_X += dx * Math.cos(theta) - dy * Math.sin(theta);
-        Pos_Y += dy * Math.cos(theta) + dx * Math.sin(theta);
+        //double theta = angle + (dtheta / 2.0);
+        Pos_X += dx * Math.cos(angle) - dy * Math.sin(angle);
+        Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
         angle += dtheta;
         current_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
     private void PathRunner(List<Pose2d> Trajectory) {
-        if (isClose) {
-            if (wayPoint + 1 < Trajectory.size()) {
-                wayPoint++;
-                isClose = false;
-            } else
-                isDone = true;
-        }
-        if (!isBusy) {
-            if(isDone)
-                Done = true;
-            else {
-                target = Trajectory.get(wayPoint);
-                isBusy = true;
-            }
-        }
-        goToPoint(target);
+
     }
 
-    private void goToPoint(Pose2d target_point) {
+    private void goToPoint(Pose2d target_point, double movementSpeed, double turnSpeed) {
         updateOdometryPos();
 
-        double curr_error_heading = target_point.getHeading() - current_point.getHeading(); // distance between actual si target
-        double error_X = target_point.getX() - current_point.getX();
-        double error_Y = target_point.getY() - current_point.getY();
-        double voltage = battery.getVoltage();
+        Pose2d err = target_point.minus(current_point);
+        double dist = Math.hypot(err.getX(), err.getY());
+        if (dist <= 1)
+            setPowers(0, 0, 0, 0);
+        else {
+            double P_X = kP_X * err.getX();
+            double P_Y = kP_Y * err.getY();
+            double P_heading = kP_Headng * err.getHeading();
 
-        if (error_X <= 5 && error_Y <= 5 && curr_error_heading <= 1)
-            isClose = true;
-        if (error_X <= 2 && error_Y <= 2 && curr_error_heading <= 0.5)
-            isBusy = false;
-        double P_X = kP_posX * error_X;
-        double P_Y = kP_posY * error_Y;
-        double P_heading = kP_heading * curr_error_heading;
+            double delta_time = timer.seconds() - prev_time;
+            double D_X = kD_X * (err.getX() - prev_error_X) / delta_time;
+            double D_Y = kD_Y * (err.getY() - prev_error_Y) / delta_time;
+            double D_heading = kD_Heading * (err.getHeading() - prev_error_heading) / delta_time;
 
-        curr_time = timer.seconds();
-        double D_X = kD_posX * (error_X - prev_error_X) / (curr_time - prev_time);
-        double D_Y = kD_posY * (error_Y - prev_error_Y) / (curr_time - prev_time);
-        double D_heading = kD_heading * (curr_error_heading - prev_error_heading) / (curr_time - prev_time);
+            prev_time = timer.seconds();
+            prev_error_X = err.getX();
+            prev_error_Y = err.getY();
+            prev_error_heading = err.getHeading();
 
-        double F = kF * voltage;
+            double absoluteAngleToTarget = Math.atan2(err.getX(), err.getY());
+            double relativeAngleToTarget = AngleWrap(absoluteAngleToTarget - current_point.getHeading());
 
-        double correction_X = P_X + D_X + F;
-        double correction_Y = P_Y + D_Y + F;
-        double correction_heading = P_heading + D_heading + F;
+            double relX = Math.sin(relativeAngleToTarget) * dist;
+            double relY = Math.cos(relativeAngleToTarget) * dist;
+            double rel_Turn = relativeAngleToTarget + target_point.getHeading();
 
-        prev_error_X = error_X;
-        prev_error_Y = error_Y;
-        prev_error_heading = curr_error_heading;
-        prev_time = curr_time;
+            double F_X = relX / (Math.abs(relX) + Math.abs(relY)) * movementSpeed;
+            double F_Y = relY / (Math.abs(relX) + Math.abs(relY)) * movementSpeed;
+            double F_heading = Range.clip(rel_Turn / Math.toRadians(30), -1, 1) * turnSpeed;
 
-        double vFL = correction_X - correction_Y - (BASE * correction_heading),
-                vBL = correction_X + correction_Y - (BASE * correction_heading),
-                vBR = correction_X - correction_Y + (BASE * correction_heading),
-                vFR = correction_X + correction_Y + (BASE * correction_heading);
+            double mov_X = P_X + D_X + F_X;
+            double mov_Y = P_Y + D_Y + F_Y;
+            double mov_Heading = P_heading + D_heading + F_heading;
 
-        LFM.setPower(vFL / WHEEL_RADIUS);
-        LBM.setPower(vBL / WHEEL_RADIUS);
-        RFM.setPower(vFR / WHEEL_RADIUS);
-        RBM.setPower(vBR / WHEEL_RADIUS);
+            double LFM_pow = mov_X - mov_Y - mov_Heading;
+            double LBM_pow = mov_X + mov_Y - mov_Heading;
+            double RBM_pow = mov_X - mov_Y + mov_Heading;
+            double RFM_pow = mov_X + mov_Y + mov_Heading;
+
+            setPowers(LFM_pow, LBM_pow, RFM_pow, RBM_pow);
+        }
     }
 
-    void TelemetryPos() {
-        telemetry.addData("Pozitie pe OX fata de start:", Pos_X);
-        telemetry.addData("Pozitie pe OY fata de start:", Pos_Y);
-        telemetry.addData("Unghi rotire:", (Math.toDegrees(angle)));
+    private void TelemetryPos() {
+        telemetry.addData("Pozitie pe OX fata de start:", current_point.getX());
+        telemetry.addData("Pozitie pe OY fata de start:", current_point.getY());
+        telemetry.addData("Unghi rotire:", (Math.toDegrees(current_point.getHeading())));
         telemetry.update();
+    }
+
+    /**
+     * double err_x = target_point.getX() - current_point.getX(),
+     * err_y = target_point.getY() - current_point.getY(),
+     * err_theta = target_point.getHeading() - current_point.getHeading();
+     * double theta = current_point.getHeading();
+     * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+     * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+     * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+     * double since0;
+     * if(err_theta==0)since0 = Math.sin(err_theta);
+     * else
+     * since0 = Math.sin(err_theta) / err_theta;
+     * double vc = vd * Math.cos(err_theta) + k * ex;
+     * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+     * <p>
+     * double vLeft = vc - w * rB;
+     * double vRight = vc + w * rB;
+     */
+    public void setPowers(double LFM_pow, double LBM_pow, double RFM_pow, double RBM_pow) {
+        double max_pow = Math.max(Math.max(RFM_pow, RBM_pow), Math.max(LFM_pow, LBM_pow));
+        LFM.setPower(LFM_pow / max_pow);
+        RFM.setPower(RFM_pow / max_pow);
+        LBM.setPower(LBM_pow / max_pow);
+        RBM.setPower(RBM_pow / max_pow);
     }
 }
 /**

@@ -6,14 +6,13 @@ import static utils.Constants.X_Multiplier;
 import static utils.Constants.Y_Multiplier;
 import static utils.Mathematics.encoderTicksToCms;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @TeleOp(name="Pozitie", group="Iterative Opmode")
@@ -26,7 +25,7 @@ public class OdometryTest extends LinearOpMode {
     private DcMotorEx RFM = null;
     private DcMotorEx LBM = null;
 
-    Telemetry telemetry= FtcDashboard.getInstance().getTelemetry();
+    //Telemetry telemetry= FtcDashboard.getInstance().getTelemetry();
 
     private Encoder leftEnc = null,
             rightEnc = null,
@@ -65,13 +64,11 @@ public class OdometryTest extends LinearOpMode {
         RFM.setDirection(DcMotorEx.Direction.REVERSE);
         RBM.setDirection(DcMotorEx.Direction.REVERSE);
 
-        /**
-        LBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        LFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        RBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-         */
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit            = BNO055IMU.AngleUnit.RADIANS;
         parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -118,17 +115,10 @@ public class OdometryTest extends LinearOpMode {
     }
     private void resetPos()
     {
-        /**
-         RBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         RFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         LBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-         LFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-         LBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         LFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         RFM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         RBM.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-         */
+        LBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        LFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RFM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RBM.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Pos_X_last = 0;
         Pos_Y_last = 0;
         Pos_X = 0;
