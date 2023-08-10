@@ -1,18 +1,18 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Stuff;
 
-import static org.firstinspires.ftc.teamcode.BezierCurveGenerator.CubicCurve;
-import static utils.Constants.Forward_Offset;
-import static utils.Constants.Horizontal_Offset;
-import static utils.Constants.X_Multiplier;
-import static utils.Constants.Y_Multiplier;
-import static utils.Constants.kD_Heading;
-import static utils.Constants.kD_X;
-import static utils.Constants.kD_Y;
-import static utils.Constants.kP_Headng;
-import static utils.Constants.kP_X;
-import static utils.Constants.kP_Y;
-import static utils.Mathematics.AngleWrap;
-import static utils.Mathematics.encoderTicksToCms;
+import static org.firstinspires.ftc.teamcode.Stuff.BezierCurveGenerator.CubicCurve;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Y_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_Heading;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_X;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_Y;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_Headng;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_X;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_Y;
+import static org.firstinspires.ftc.teamcode.utils.Mathematics.AngleWrap;
+import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms;
 
 import android.annotation.SuppressLint;
 
@@ -24,6 +24,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.teamcode.utils.Encoder;
+import org.firstinspires.ftc.teamcode.utils.Point;
 
 import java.util.List;
 

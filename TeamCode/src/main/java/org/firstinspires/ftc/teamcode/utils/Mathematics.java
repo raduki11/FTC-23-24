@@ -1,9 +1,4 @@
-package utils;
-
-import static utils.Constants.TICKS_PER_REV;
-import static utils.Constants.WHEEL_RADIUS_ODO;
-
-import org.firstinspires.ftc.teamcode.Point;
+package org.firstinspires.ftc.teamcode.utils;
 
 public class Mathematics {
     public static double calculateDerivative(double p0, double p1, double p2, double p3, double t) {
@@ -17,7 +12,7 @@ public class Mathematics {
     }
 
     public static double encoderTicksToCms(double ticks) {
-        return 2.0 * WHEEL_RADIUS_ODO * Math.PI * ticks / TICKS_PER_REV;
+        return 2.0 * Constants.WHEEL_RADIUS_ODO * Math.PI * ticks / Constants.TICKS_PER_REV;
     }
 
     public static double AngleWrap(double angle) {
