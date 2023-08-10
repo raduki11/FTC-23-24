@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Stuff;
+package org.firstinspires.ftc.teamcode.Algorithms;
 
 import static org.firstinspires.ftc.teamcode.utils.Mathematics.calculateHeading;
 

@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode.Stuff;
+package org.firstinspires.ftc.teamcode.Algorithms;
 
-import static org.firstinspires.ftc.teamcode.Stuff.BezierCurveGenerator.CubicCurve;
+import static org.firstinspires.ftc.teamcode.Algorithms.BezierCurveGenerator.CubicCurve;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
@@ -166,10 +166,6 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         current_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
-    private void PathRunner(List<Pose2d> Trajectory) {
-
-    }
-
     private void goToPoint(Pose2d target_point, double movementSpeed, double turnSpeed) {
         updateOdometryPos();
 
@@ -226,13 +222,14 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     }
 
     public void setPowers(double LFM_pow, double LBM_pow, double RFM_pow, double RBM_pow) {
-        double max_pow = Math.max(Math.max(RFM_pow, RBM_pow), Math.max(LFM_pow, LBM_pow));
-        if (max_pow == 0)
-            max_pow = 1;
-        LFM.setPower(LFM_pow / max_pow);
-        RFM.setPower(RFM_pow / max_pow);
-        LBM.setPower(LBM_pow / max_pow);
-        RBM.setPower(RBM_pow / max_pow);
+        Range.clip(LFM_pow,-0.8,0.8);
+        Range.clip(LBM_pow,-0.8,0.8);
+        Range.clip(RFM_pow,-0.8,0.8);
+        Range.clip(RBM_pow,-0.8,0.8);
+        LFM.setPower(LFM_pow);
+        RFM.setPower(RFM_pow);
+        LBM.setPower(LBM_pow);
+        RBM.setPower(RBM_pow);
     }
 }
 
