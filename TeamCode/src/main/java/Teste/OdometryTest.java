@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package Teste;
 
 import static utils.Constants.Forward_Offset;
 import static utils.Constants.Horizontal_Offset;
@@ -14,8 +14,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import utils.Encoder;
 
-@TeleOp(name="Pozitie", group="Iterative Opmode")
+@TeleOp(name="Test Odometrie", group="Iterative Opmode")
 public class OdometryTest extends LinearOpMode {
     private double      Pos_X = 0,
                         Pos_Y =0,
