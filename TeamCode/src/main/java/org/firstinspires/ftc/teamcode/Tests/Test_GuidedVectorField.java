@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Algorithms.CubicBezierCurve;
 import org.firstinspires.ftc.teamcode.Algorithms.GVFPathFollowing;
@@ -128,11 +129,12 @@ public class Test_GuidedVectorField extends LinearOpMode {
         double LBM_pow = mov.getX() + mov.getY() - mov.getHeading();
         double RBM_pow = mov.getX() - mov.getY() + mov.getHeading();
         double RFM_pow = mov.getX() + mov.getY() + mov.getHeading();
-/**
- double max_pow = Math.max(Math.max(RFM_pow, RBM_pow), Math.max(LFM_pow, LBM_pow));
- if (max_pow == 0)
- max_pow = 1;
- */
+
+        Range.clip(LFM_pow,-0.8,0.8);
+        Range.clip(LBM_pow,-0.8,0.8);
+        Range.clip(RFM_pow,-0.8,0.8);
+        Range.clip(RBM_pow,-0.8,0.8);
+
         LFM.setPower(LFM_pow * movementSpeed);
         RFM.setPower(RFM_pow * movementSpeed);
         LBM.setPower(LBM_pow * movementSpeed);

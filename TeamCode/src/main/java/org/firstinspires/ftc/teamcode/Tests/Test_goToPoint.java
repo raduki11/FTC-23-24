@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Algorithms.GoToPoint;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
@@ -143,13 +144,16 @@ public class Test_goToPoint extends LinearOpMode {
         double LBM_pow = MotorPower.get(1);
         double RFM_pow = MotorPower.get(2);
         double RBM_pow = MotorPower.get(3);
-        double max_pow = Math.max(Math.max(RFM_pow, RBM_pow), Math.max(LFM_pow, LBM_pow));
-        if (max_pow == 0)
-            max_pow = 1;
-        LFM.setPower(LFM_pow / max_pow);
-        RFM.setPower(RFM_pow / max_pow);
-        LBM.setPower(LBM_pow / max_pow);
-        RBM.setPower(RBM_pow / max_pow);
+
+        Range.clip(LFM_pow,-0.8,0.8);
+        Range.clip(LBM_pow,-0.8,0.8);
+        Range.clip(RFM_pow,-0.8,0.8);
+        Range.clip(RBM_pow,-0.8,0.8);
+        
+        LFM.setPower(LFM_pow);
+        RFM.setPower(RFM_pow);
+        LBM.setPower(LBM_pow);
+        RBM.setPower(RBM_pow);
     }
 }
 
