@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Algorithms;
+package org.firstinspires.ftc.teamcode.Teste;
 
 import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
@@ -14,48 +14,32 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Algorithms.GoToPoint;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
 
 import java.util.List;
 
 @Config
-@Autonomous(name = "Test capacitate", group = "Autonomus")
-public class Autonomie_Rr_Custom extends LinearOpMode {
+@Autonomous(name = "Test goToPoint", group = "Autonomus")
+public class Test_goToPoint extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
     private DcMotorEx LFM = null;
     private DcMotorEx RFM = null;
     private DcMotorEx LBM = null;
-    private Encoder leftEnc = null,
-            rightEnc = null,
-            midEnc = null;
+    private Encoder leftEnc = null;
+    private Encoder rightEnc = null;
+    private Encoder midEnc = null;
     private double Pos_X = 0;
     private double Pos_Y = 0;
     private double angle = 0;
     Pose2d current_point = new Pose2d(0, 0, 0);
     GoToPoint drive = new GoToPoint();
     //Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
-    private double curr_LeftEncPos = 0,
-            curr_RightEncPos = 0,
-            curr_MidEncPos = 0;
-
-    private double prev_LeftEncPos = 0,
-            prev_RightEncPos = 0,
-            prev_MidEncPos = 0;
-
-    private double delta_LeftEncPos = 0,
-            delta_RightEncPos = 0,
-            delta_MidEncPos = 0;
-    private double r0 = 0, r1 = 0;
-
-    private int wayPoint = 0;
-    int go = 1;
+    private double curr_LeftEncPos = 0;
+    private double curr_RightEncPos = 0;
+    private double curr_MidEncPos = 0;
     boolean isBusy = false;
-    boolean isClose = false;
-    boolean isDone = false;
-    boolean Done = false;
-    int da = -1;
-    Pose2d target = new Pose2d();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -109,7 +93,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
              test.reset();
              }
              */
-            setPowers(drive.goToPoint(timer, current_point, new Pose2d(100, 0, Math.toRadians(0)),  0.2, 0));
+            setPowers(drive.goToPoint(timer, current_point, new Pose2d(100, 0, Math.toRadians(0)), 0.2, 0));
             TelemetryPos();
         }
     }
@@ -126,24 +110,24 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
     }
 
     private void updateOdometryPos() {
-        prev_LeftEncPos = curr_LeftEncPos;
-        prev_RightEncPos = curr_RightEncPos;
-        prev_MidEncPos = curr_MidEncPos;
+        double prev_LeftEncPos = curr_LeftEncPos;
+        double prev_RightEncPos = curr_RightEncPos;
+        double prev_MidEncPos = curr_MidEncPos;
         //Localization with position
         citireEncodere();
 
-        delta_LeftEncPos = curr_LeftEncPos - prev_LeftEncPos;
-        delta_RightEncPos = curr_RightEncPos - prev_RightEncPos;
-        delta_MidEncPos = curr_MidEncPos - prev_MidEncPos;
+        double delta_LeftEncPos = curr_LeftEncPos - prev_LeftEncPos;
+        double delta_RightEncPos = curr_RightEncPos - prev_RightEncPos;
+        double delta_MidEncPos = curr_MidEncPos - prev_MidEncPos;
 
         double dtheta = (delta_RightEncPos - delta_LeftEncPos) / Horizontal_Offset;
         double dx = (delta_LeftEncPos + delta_RightEncPos) / 2.0;
         double dy = delta_MidEncPos - dtheta * Forward_Offset;
 
-        //double theta = angle + (dtheta / 2.0);
         Pos_X += dx * Math.cos(angle) - dy * Math.sin(angle);
         Pos_Y += dy * Math.cos(angle) + dx * Math.sin(angle);
         angle += dtheta;
+
         current_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
@@ -185,6 +169,23 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
  * prev_error_POS = curr_error_POS;
  * prev_error_POS = curr_error_heading;
  * prev_time = curr_time;
+ * <p>
+ * double err_x = target_point.getX() - current_point.getX(),
+ * err_y = target_point.getY() - current_point.getY(),
+ * err_theta = target_point.getHeading() - current_point.getHeading();
+ * double theta = current_point.getHeading();
+ * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+ * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+ * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+ * double since0;
+ * if(err_theta==0)since0 = Math.sin(err_theta);
+ * else
+ * since0 = Math.sin(err_theta) / err_theta;
+ * double vc = vd * Math.cos(err_theta) + k * ex;
+ * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+ * <p>
+ * double vLeft = vc - w * rB;
+ * double vRight = vc + w * rB;
  * <p>
  * double err_x = target_point.getX() - current_point.getX(),
  * err_y = target_point.getY() - current_point.getY(),
