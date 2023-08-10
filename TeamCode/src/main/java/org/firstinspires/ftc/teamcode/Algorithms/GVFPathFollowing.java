@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Algorithms;
 
+import static org.firstinspires.ftc.teamcode.utils.Constants.CORRECTION_DISTANCE;
+import static org.firstinspires.ftc.teamcode.utils.Constants.SAVING_THROW_DISTANCE;
+
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 public class GVFPathFollowing {
@@ -10,8 +13,6 @@ public class GVFPathFollowing {
         Vector2D curveDerivative = curve.derivative(closestT);
         Vector2D robotToClosestPoint = closestPoint.subtract(curr_pos);
         Vector2D endPoint = curve.calculate(1);
-        double CORRECTION_DISTANCE = 100;
-        double SAVING_THROW_DISTANCE = 100;
         double directPursuitThreshold = 1;
         for (double i = 1; i >= 0; i -= 1 / 100.0) {
             double dist = endPoint.subtract(curve.calculate(i)).getMagSq();

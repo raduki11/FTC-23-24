@@ -149,7 +149,7 @@ public class Test_goToPoint extends LinearOpMode {
         Range.clip(LBM_pow,-0.8,0.8);
         Range.clip(RFM_pow,-0.8,0.8);
         Range.clip(RBM_pow,-0.8,0.8);
-        
+
         LFM.setPower(LFM_pow);
         RFM.setPower(RFM_pow);
         LBM.setPower(LBM_pow);
