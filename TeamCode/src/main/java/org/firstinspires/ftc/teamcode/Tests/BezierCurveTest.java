@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Teste;
+package org.firstinspires.ftc.teamcode.Tests;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;

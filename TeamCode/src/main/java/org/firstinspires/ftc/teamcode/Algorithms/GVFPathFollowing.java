@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Algorithms;
 
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
-public class GVPathFollowing {
+public class GVFPathFollowing {
     public Vector2D calcGuidanceVector(CubicBezierCurve curve, Vector2D curr_pos) {
         long startTime = System.nanoTime();
         double closestT = findClosestPoint(curve, curr_pos);
