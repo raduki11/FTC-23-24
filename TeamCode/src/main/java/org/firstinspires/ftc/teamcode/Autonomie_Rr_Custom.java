@@ -18,12 +18,10 @@ import java.util.List;
 
 import utils.Encoder;
 
-//TODO Motion Profiler for goToPoint function
 @Config
 @Autonomous(name = "Test capacitate", group = "Autonomus")
 public class Autonomie_Rr_Custom extends LinearOpMode {
-    ElapsedTime test = new ElapsedTime();
-    private double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
+    public  double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
     private double const_pow = 0;
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
@@ -113,11 +111,10 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
              test.reset();
              }
              */
-            setPowers(drive.goToPoint(timer,new Pose2d(100, 0, Math.toRadians(0)), current_point, 0.2, 0));
+            setPowers(drive.goToPoint(timer, new Pose2d(100, 0, Math.toRadians(0)), current_point, 0.2, 0));
             TelemetryPos();
         }
     }
-
 
 
     private void citireEncodere() {
@@ -190,6 +187,23 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
  * prev_error_POS = curr_error_POS;
  * prev_error_POS = curr_error_heading;
  * prev_time = curr_time;
+ * <p>
+ * double err_x = target_point.getX() - current_point.getX(),
+ * err_y = target_point.getY() - current_point.getY(),
+ * err_theta = target_point.getHeading() - current_point.getHeading();
+ * double theta = current_point.getHeading();
+ * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+ * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+ * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+ * double since0;
+ * if(err_theta==0)since0 = Math.sin(err_theta);
+ * else
+ * since0 = Math.sin(err_theta) / err_theta;
+ * double vc = vd * Math.cos(err_theta) + k * ex;
+ * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+ * <p>
+ * double vLeft = vc - w * rB;
+ * double vRight = vc + w * rB;
  * <p>
  * double err_x = target_point.getX() - current_point.getX(),
  * err_y = target_point.getY() - current_point.getY(),

@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GoToPoint {
-    double prev_error_X = 0, prev_error_Y = 0,prev_error_heading = 0, prev_time = 0;
     public List<Double> goToPoint(ElapsedTime timer, Pose2d target_point, Pose2d current_point, double movementSpeed, double turnSpeed) {
         List<Double> motor = new ArrayList<>();
         Pose2d err = target_point.minus(current_point);
