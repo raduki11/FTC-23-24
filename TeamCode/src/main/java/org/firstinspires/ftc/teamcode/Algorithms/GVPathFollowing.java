@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Algorithms;
 
-import utils.Vector2D;
+import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 public class GVPathFollowing {
     public Vector2D calcGuidanceVector(CubicBezierCurve curve, Vector2D curr_pos) {

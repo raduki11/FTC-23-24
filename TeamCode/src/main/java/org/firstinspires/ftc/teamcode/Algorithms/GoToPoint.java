@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Algorithms;
 
-import static utils.Constants.kD_Heading;
-import static utils.Constants.kD_X;
-import static utils.Constants.kD_Y;
-import static utils.Constants.kP_Headng;
-import static utils.Constants.kP_X;
-import static utils.Constants.kP_Y;
-import static utils.Mathematics.AngleWrap;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_Heading;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_X;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kD_Y;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_Headng;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_X;
+import static org.firstinspires.ftc.teamcode.utils.Constants.kP_Y;
+import static org.firstinspires.ftc.teamcode.utils.Mathematics.AngleWrap;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -16,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GoToPoint {
-    public List<Double> goToPoint(ElapsedTime timer, Pose2d target_point, Pose2d current_point, double movementSpeed, double turnSpeed) {
+    private double prev_error_heading = 0, prev_time = 0, prev_error_X = 0, prev_error_Y = 0;
+    public List<Double> goToPoint(ElapsedTime timer, Pose2d current_point, Pose2d target_point, double movementSpeed, double turnSpeed) {
         List<Double> motor = new ArrayList<>();
         Pose2d err = target_point.minus(current_point);
         double dist = Math.hypot(err.getX(), err.getY());
@@ -66,8 +67,8 @@ public class GoToPoint {
 
             motor.set(0,LFM_pow);
             motor.set(1,LBM_pow);
-            motor.set(2,RBM_pow);
-            motor.set(3,RFM_pow);
+            motor.set(2,RFM_pow);
+            motor.set(3,RBM_pow);
         }
         return motor;
     }

@@ -1,4 +1,4 @@
-package z_NotInUse_OldStuff;
+package org.firstinspires.ftc.teamcode.NotInUse_OldStuff;
 
 public class Point {
     public double X;

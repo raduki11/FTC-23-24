@@ -1,10 +1,10 @@
-package Teste;
+package org.firstinspires.ftc.teamcode.Teste;
 
-import static utils.Constants.Forward_Offset;
-import static utils.Constants.Horizontal_Offset;
-import static utils.Constants.X_Multiplier;
-import static utils.Constants.Y_Multiplier;
-import static utils.Mathematics.encoderTicksToCms;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Y_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import utils.Encoder;
+import org.firstinspires.ftc.teamcode.utils.Encoder;
 
 @TeleOp(name="Test Odometrie", group="Iterative Opmode")
 public class OdometryTest extends LinearOpMode {

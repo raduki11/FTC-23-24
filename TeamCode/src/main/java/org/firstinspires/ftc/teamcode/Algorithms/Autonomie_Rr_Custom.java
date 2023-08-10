@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Algorithms;
 
-import static utils.Constants.Forward_Offset;
-import static utils.Constants.Horizontal_Offset;
-import static utils.Constants.X_Multiplier;
-import static utils.Constants.Y_Multiplier;
-import static utils.Mathematics.encoderTicksToCms;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
+import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Constants.Y_Multiplier;
+import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -14,15 +14,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.List;
+import org.firstinspires.ftc.teamcode.utils.Encoder;
 
-import utils.Encoder;
+import java.util.List;
 
 @Config
 @Autonomous(name = "Test capacitate", group = "Autonomus")
 public class Autonomie_Rr_Custom extends LinearOpMode {
-    public  double prev_error_POS = 0, prev_error_heading = 0, curr_time = 0, prev_time = 0, sumI_pos = 0, sumI_heading = 0, prev_error_X = 0, prev_error_Y = 0;
-    private double const_pow = 0;
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
     private DcMotorEx LFM = null;
@@ -111,7 +109,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
              test.reset();
              }
              */
-            setPowers(drive.goToPoint(timer, new Pose2d(100, 0, Math.toRadians(0)), current_point, 0.2, 0));
+            setPowers(drive.goToPoint(timer, current_point, new Pose2d(100, 0, Math.toRadians(0)),  0.2, 0));
             TelemetryPos();
         }
     }
@@ -156,7 +154,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
         telemetry.update();
     }
 
-    public void setPowers(List<Double> MotorPower) {
+    private void setPowers(List<Double> MotorPower) {
         double LFM_pow = MotorPower.get(0);
         double LBM_pow = MotorPower.get(1);
         double RFM_pow = MotorPower.get(2);
