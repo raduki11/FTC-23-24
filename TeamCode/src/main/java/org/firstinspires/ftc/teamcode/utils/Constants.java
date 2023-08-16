@@ -18,14 +18,14 @@ public class Constants {
 
 
     //GoToPoint Constants ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    public static double kP_X = 0, kD_X = 0,
-            kP_Y = 0, kD_Y = 0,
-            kP_Headng = 0, kD_Heading = 0;
+    public static double kP_X = 0.01, kD_X = 0.005,
+            kP_Y = 0.01, kD_Y = 0.005,
+            kP_Headng = 0.5, kD_Heading = 0.007;
     //GoToPoint Constants ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
     //GVF Constants ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    public static double CORRECTION_DISTANCE = 100;
-    public static double SAVING_THROW_DISTANCE = 100;
+    public static double CORRECTION_DISTANCE = 5;
+    public static double SAVING_THROW_DISTANCE = 0;
     //GVF Constants ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 }

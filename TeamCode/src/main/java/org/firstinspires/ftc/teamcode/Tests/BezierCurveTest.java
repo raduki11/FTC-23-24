@@ -1,17 +1,15 @@
 package org.firstinspires.ftc.teamcode.Tests;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.firstinspires.ftc.teamcode.NotInUse_OldStuff.BezierCurveGenerator;
 import org.firstinspires.ftc.teamcode.NotInUse_OldStuff.Point;
 
-@Disabled
+import java.util.ArrayList;
+import java.util.List;
+
 @TeleOp(name = "Curve test")
 public class BezierCurveTest extends LinearOpMode {
     @Override
@@ -21,7 +19,7 @@ public class BezierCurveTest extends LinearOpMode {
         Point C = new Point(-4, 100);
         Point D = new Point(50, 100);
         List<Pose2d> Traj = new ArrayList<>();
-        Traj = BezierCurveGenerator.CubicCurve(A, B, C, D, 10);
+        Traj = BezierCurveGenerator.CubicCurve(A, B, C, D, 100);
         telemetry.addLine("Gata");
         telemetry.update();
         waitForStart();

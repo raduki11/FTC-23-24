@@ -86,7 +86,7 @@ public class OdometryTest extends LinearOpMode {
 
         leftEnc.setDirection(Encoder.Direction.FORWARD);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.REVERSE);
+        midEnc.setDirection(Encoder.Direction.FORWARD);
 
         //START
 
