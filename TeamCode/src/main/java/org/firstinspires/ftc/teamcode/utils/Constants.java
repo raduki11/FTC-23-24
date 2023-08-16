@@ -26,6 +26,6 @@ public class Constants {
 
     //GVF Constants ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
     public static double CORRECTION_DISTANCE = 5;
-    public static double SAVING_THROW_DISTANCE = 0;
+    //public static double SAVING_THROW_DISTANCE = 0;
     //GVF Constants ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 }
