@@ -11,7 +11,7 @@ public class Constants {
     public static final double TICKS_PER_REV = 8192;
     public static final double X_Multiplier = 1.0155,
             Y_Multiplier = 1.028;
-    public static double kP_X = 0, kD_X = 0,
-            kP_Y = 0, kD_Y = 0,
-            kP_Headng = 0, kD_Heading = 0;
+    public static double kP_X = 0.01, kD_X = 0.005,
+            kP_Y = 0.01, kD_Y = 0.005,
+            kP_Headng = 0.5, kD_Heading = 0.007;
 }

@@ -129,7 +129,7 @@ public class Autonomie_Rr_Custom extends LinearOpMode {
              test.reset();
              }
              */
-            goToPoint(new Pose2d(100, 0, Math.toRadians(0)), 0.2, 0);
+            goToPoint(new Pose2d(100, -100, Math.toRadians(0)), 0.2, 0);
             TelemetryPos();
         }
     }
