@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.utils;
 
+import org.firstinspires.ftc.teamcode.NotInUse_OldStuff.Point;
+
 public class Mathematics {
     public static double calculateDerivative(double p0, double p1, double p2, double p3, double t) {
         return 3 * Math.pow(1 - t, 2) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * Math.pow(t, 2) * (p3 - p2);
