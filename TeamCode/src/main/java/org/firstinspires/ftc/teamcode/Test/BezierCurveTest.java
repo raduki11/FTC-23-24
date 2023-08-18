@@ -1,15 +1,15 @@
 package org.firstinspires.ftc.teamcode.Test;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Algorithms.BezierCurveGenerator;
+import org.firstinspires.ftc.teamcode.NotInUse_OldStuff.BezierCurveGenerator;
 import org.firstinspires.ftc.teamcode.utils.Point;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @TeleOp(name = "Curve test")
 public class BezierCurveTest extends LinearOpMode {
     @Override

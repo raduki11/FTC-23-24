@@ -1,6 +1,7 @@
-package org.firstinspires.ftc.teamcode.Algorithms;
+package org.firstinspires.ftc.teamcode.NotInUse_OldStuff;
 
 import static org.firstinspires.ftc.teamcode.Algorithms.BezierCurveGenerator.CubicCurve;
+import static org.firstinspires.ftc.teamcode.NotInUse_OldStuff.BezierCurveGenerator.CubicCurve;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
@@ -19,6 +20,7 @@ import android.annotation.SuppressLint;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -29,7 +31,7 @@ import org.firstinspires.ftc.teamcode.utils.Encoder;
 import org.firstinspires.ftc.teamcode.utils.Point;
 
 import java.util.List;
-
+@Disabled
 @Config
 @Autonomous(name = "Test capacitate", group = "Autonomus")
 public class Autonomie_Rr_Custom extends LinearOpMode {
