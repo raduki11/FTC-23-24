@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,6 +21,8 @@ import org.firstinspires.ftc.teamcode.Algorithms.CubicBezierCurve;
 import org.firstinspires.ftc.teamcode.Algorithms.GVFPathFollowing;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
 import org.firstinspires.ftc.teamcode.utils.Vector2D;
+
+import java.util.List;
 
 @Autonomous(name = "Test GuidingVector", group = "Autonomus")
 public class Test_GuidedVectorField extends LinearOpMode {
@@ -72,10 +75,16 @@ public class Test_GuidedVectorField extends LinearOpMode {
         leftEnc.setDirection(Encoder.Direction.FORWARD);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
         midEnc.setDirection(Encoder.Direction.FORWARD);
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         //START
         CubicBezierCurve traj = new CubicBezierCurve(new Vector2D(0, 0), new Vector2D(48.5, -82.7), new Vector2D(75.6, 65), new Vector2D(105.3, -19.4));
         waitForStart();
+
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         timer.reset();
         isBusy = true;
         Pos_X = 0;
@@ -85,6 +94,9 @@ public class Test_GuidedVectorField extends LinearOpMode {
         curr_point = new Pose2d(0, 0, 0);
         Pose2d target_point = new Pose2d(traj.calculate(1).getX(), traj.calculate(1).getY(),traj.heading(1));
         while (opModeIsActive()) {
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+            }
             updateOdometryPos();
             Pose2d movVector = drive.calcGuidanceVector(traj, current_point,curr_point.getHeading());
             Pose2d err = target_point.minus(curr_point);

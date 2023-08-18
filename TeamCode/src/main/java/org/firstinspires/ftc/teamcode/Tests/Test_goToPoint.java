@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,6 +19,8 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Algorithms.GoToPoint;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
+
+import java.util.List;
 
 @Autonomous(name = "Test goToPoint", group = "Autonomus")
 public class Test_goToPoint extends LinearOpMode {
@@ -74,6 +77,11 @@ public class Test_goToPoint extends LinearOpMode {
         //START
         int da = -1;
         waitForStart();
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
+
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         timer.reset();
         isBusy = true;
         Pos_X = 0;
@@ -81,6 +89,9 @@ public class Test_goToPoint extends LinearOpMode {
         angle = 0;
         current_point = new Pose2d(0, 0, 0);
         while (opModeIsActive()) {
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+            }
             updateOdometryPos();
             //if(!Done)PathRunner(traj);
             setPowers(drive.goToPoint(timer, current_point, target_point, 0.3, 0));
