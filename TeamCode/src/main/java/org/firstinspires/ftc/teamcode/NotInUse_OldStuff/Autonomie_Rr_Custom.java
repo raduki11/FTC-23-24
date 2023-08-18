@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.NotInUse_OldStuff;
 
-import static org.firstinspires.ftc.teamcode.Algorithms.BezierCurveGenerator.CubicCurve;
 import static org.firstinspires.ftc.teamcode.NotInUse_OldStuff.BezierCurveGenerator.CubicCurve;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Forward_Offset;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Horizontal_Offset;
