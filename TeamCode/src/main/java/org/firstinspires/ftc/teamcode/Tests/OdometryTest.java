@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
+
+import java.util.List;
 
 @TeleOp(name="Test Odometrie", group="Iterative Opmode")
 public class OdometryTest extends LinearOpMode {
@@ -84,16 +87,24 @@ public class OdometryTest extends LinearOpMode {
         rightEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RFM"));
         midEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "LBM"));
 
-        leftEnc.setDirection(Encoder.Direction.FORWARD);
+        leftEnc.setDirection(Encoder.Direction.REVERSE);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.FORWARD);
+        midEnc.setDirection(Encoder.Direction.REVERSE);
 
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         //START
+
 
         waitForStart();
         //LOOP
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.MANUAL);
+        }
         while(!isStopRequested())
         {
+            for (LynxModule hub : allHubs) {
+                hub.clearBulkCache();
+            }
             updateOdometryPos();
 
             double y = -gamepad1.left_stick_y;

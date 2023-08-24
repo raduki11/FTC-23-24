@@ -6,23 +6,20 @@ import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Y_Multiplier;
 import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Algorithms.GoToPoint;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
 
 import java.util.List;
 
-@Autonomous(name = "Test goToPoint", group = "Autonomus")
+@TeleOp(name = "Test goToPoint", group = "Autonomus")
 public class Test_goToPoint extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
@@ -36,9 +33,8 @@ public class Test_goToPoint extends LinearOpMode {
     private double Pos_Y = 0;
     private double angle = 0;
     Pose2d current_point = new Pose2d(0, 0, 0);
-    Pose2d target_point = new Pose2d(0, 0, 0);
     GoToPoint drive = new GoToPoint();
-    Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+    //Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private double curr_LeftEncPos = 0;
     private double curr_RightEncPos = 0;
     private double curr_MidEncPos = 0;
@@ -70,9 +66,9 @@ public class Test_goToPoint extends LinearOpMode {
         rightEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RFM"));
         midEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "LBM"));
 
-        leftEnc.setDirection(Encoder.Direction.FORWARD);
+        leftEnc.setDirection(Encoder.Direction.REVERSE);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.FORWARD);
+        midEnc.setDirection(Encoder.Direction.REVERSE);
 
         //START
         int da = -1;
@@ -87,27 +83,33 @@ public class Test_goToPoint extends LinearOpMode {
         Pos_X = 0;
         Pos_Y = 0;
         angle = 0;
+        Pose2d target_point = new Pose2d(0, 0, Math.toRadians(90));
         current_point = new Pose2d(0, 0, 0);
         while (opModeIsActive()) {
             for (LynxModule hub : allHubs) {
                 hub.clearBulkCache();
             }
             updateOdometryPos();
+
             //if(!Done)PathRunner(traj);
-            setPowers(drive.goToPoint(timer, current_point, target_point, 0.3, 0));
+            /**
+            setPowers(drive.goToPoint(timer, current_point, target_point, 0.4, 0),0.6);
             if (!isBusy) {
-                if (da == 1) target_point = new Pose2d(100, -100, Math.toRadians(0));
+                if (da == -1) target_point = new Pose2d(0, 0, Math.toRadians(90));
                 else target_point = new Pose2d(0, 0, Math.toRadians(0));
                 isBusy = true;
                 da = -da;
                 sleep(500);
             }
+             */
             Pose2d err = target_point.minus(current_point);
             double dist = Math.hypot(err.getX(), err.getY());
-            if (dist <= 2 && err.getHeading() <= 0.3) {
-                isBusy = false;
+            if (dist > 2 || Math.toDegrees(Math.abs(err.getHeading())) > 1) {
+                setPowers(drive.goToPoint(timer, current_point, target_point, 0.4, 0),0.6);
             }
-            //setPowers(drive.goToPoint(timer, current_point, new Pose2d(200, 0, Math.toRadians(0)), 0.2, 0));
+             else
+                setPowers(drive.goToPoint(timer, current_point, target_point, 0, 0),0);
+
             TelemetryPos();
         }
     }
@@ -152,25 +154,35 @@ public class Test_goToPoint extends LinearOpMode {
         telemetry.update();
     }
 
-    private void setPowers(Pose2d movmentPower) {
+    private void setPowers(Pose2d movmentPower, double speed) {
         double mov_X = movmentPower.getX();
         double mov_Y = movmentPower.getY();
         double mov_Heading = movmentPower.getHeading();
 
-        double LFM_pow = mov_X - mov_Y - mov_Heading;
-        double LBM_pow = mov_X + mov_Y - mov_Heading;
-        double RBM_pow = mov_X - mov_Y + mov_Heading;
-        double RFM_pow = mov_X + mov_Y + mov_Heading;
+        double rot_X = mov_Y * Math.cos(-angle) + mov_X * Math.sin(-angle);// -mov_Y * Math.sin(-angle) + mov_X * Math.cos(-angle);
+        double rot_Y = mov_Y * Math.sin(-angle) - mov_X * Math.cos(-angle);//
 
-        Range.clip(LFM_pow/2 , -0.8, 0.8);
-        Range.clip(LBM_pow/2 , -0.8, 0.8);
-        Range.clip(RFM_pow/2 , -0.8, 0.8);
-        Range.clip(RBM_pow/2 , -0.8, 0.8);
+        double denomonator = Math.abs(Math.max(Math.abs(rot_Y) + Math.abs(rot_X) + Math.abs(mov_Heading), 1));
+
+        double LFM_pow = (-rot_X - rot_Y - mov_Heading) / denomonator;
+        double LBM_pow = (rot_X - rot_Y - mov_Heading) / denomonator;
+        double RBM_pow = (rot_X - rot_Y + mov_Heading) / denomonator;
+        double RFM_pow = (-rot_X - rot_Y + mov_Heading) / denomonator;
+        //double LFM_pow = mov_X - mov_Y - mov_Heading;
+        //double LBM_pow = mov_X + mov_Y - mov_Heading;
+        //double RBM_pow = mov_X - mov_Y + mov_Heading;
+        //double RFM_pow = mov_X + mov_Y + mov_Heading;
+
+
 
         LFM.setPower(LFM_pow);
         RFM.setPower(RFM_pow);
         LBM.setPower(LBM_pow);
         RBM.setPower(RBM_pow);
+
+        telemetry.addData("x: ", rot_X);
+        telemetry.addData("y: ", rot_Y);
+        telemetry.addData("a: ", mov_Heading);
     }
 }
 
@@ -190,6 +202,40 @@ public class Test_goToPoint extends LinearOpMode {
  * prev_error_POS = curr_error_POS;
  * prev_error_POS = curr_error_heading;
  * prev_time = curr_time;
+ * <p>
+ * double err_x = target_point.getX() - current_point.getX(),
+ * err_y = target_point.getY() - current_point.getY(),
+ * err_theta = target_point.getHeading() - current_point.getHeading();
+ * double theta = current_point.getHeading();
+ * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+ * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+ * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+ * double since0;
+ * if(err_theta==0)since0 = Math.sin(err_theta);
+ * else
+ * since0 = Math.sin(err_theta) / err_theta;
+ * double vc = vd * Math.cos(err_theta) + k * ex;
+ * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+ * <p>
+ * double vLeft = vc - w * rB;
+ * double vRight = vc + w * rB;
+ * <p>
+ * double err_x = target_point.getX() - current_point.getX(),
+ * err_y = target_point.getY() - current_point.getY(),
+ * err_theta = target_point.getHeading() - current_point.getHeading();
+ * double theta = current_point.getHeading();
+ * double ex = Math.cos(theta) * err_x + Math.sin(theta) * err_y,
+ * ey = Math.cos(theta) * err_y - Math.sin(theta) * err_x;
+ * double k = 2 * kZeta * Math.sqrt(wd * wd + vd * vd);
+ * double since0;
+ * if(err_theta==0)since0 = Math.sin(err_theta);
+ * else
+ * since0 = Math.sin(err_theta) / err_theta;
+ * double vc = vd * Math.cos(err_theta) + k * ex;
+ * double w = wd + k * err_theta + kBeta * vd * since0 * ey;
+ * <p>
+ * double vLeft = vc - w * rB;
+ * double vRight = vc + w * rB;
  * <p>
  * double err_x = target_point.getX() - current_point.getX(),
  * err_y = target_point.getY() - current_point.getY(),

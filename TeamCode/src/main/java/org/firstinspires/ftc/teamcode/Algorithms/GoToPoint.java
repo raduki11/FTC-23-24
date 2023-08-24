@@ -19,7 +19,7 @@ public class GoToPoint {
         Pose2d movement = new Pose2d(0, 0, 0);
         Pose2d err = target_point.minus(current_point);
         double dist = Math.hypot(err.getX(), err.getY());
-        if (dist <= 2 && err.getHeading() <= 0.3) {
+        if (dist <= 2 && Math.toDegrees(Math.abs(err.getHeading())) <= 1) {
             movement = new Pose2d(0, 0, 0);
         } else {
             double P_X = kP_X * err.getX();
@@ -41,14 +41,14 @@ public class GoToPoint {
 
             double relX = Math.sin(relativeAngleToTarget) * dist;
             double relY = Math.cos(relativeAngleToTarget) * dist;
-            double rel_Turn = target_point.getHeading() - relativeAngleToTarget;
+            //double rel_Turn = target_point.getHeading() - relativeAngleToTarget;
 
             double nominator = Math.abs(relX) + Math.abs(relY);
             if (nominator == 0) nominator = 1;
 
             double F_X = relX / nominator;
             double F_Y = relY / nominator;
-            double F_heading = Range.clip(rel_Turn / Math.toRadians(30), -1, 1) * turnSpeed;
+            double F_heading = Range.clip(relativeAngleToTarget / Math.toRadians(30), -1, 1) * turnSpeed;
 
             double mov_X = (P_X + D_X + F_X) * movementSpeed;
             double mov_Y = (P_Y + D_Y + F_Y)  * movementSpeed;

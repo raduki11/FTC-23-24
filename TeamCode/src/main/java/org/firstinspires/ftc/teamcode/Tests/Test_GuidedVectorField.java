@@ -6,17 +6,14 @@ import static org.firstinspires.ftc.teamcode.utils.Constants.X_Multiplier;
 import static org.firstinspires.ftc.teamcode.utils.Constants.Y_Multiplier;
 import static org.firstinspires.ftc.teamcode.utils.Mathematics.encoderTicksToCms;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Algorithms.CubicBezierCurve;
 import org.firstinspires.ftc.teamcode.Algorithms.GVFPathFollowing;
 import org.firstinspires.ftc.teamcode.utils.Encoder;
@@ -24,7 +21,7 @@ import org.firstinspires.ftc.teamcode.utils.Vector2D;
 
 import java.util.List;
 
-@Autonomous(name = "Test GuidingVector", group = "Autonomus")
+@TeleOp(name = "Test GuidingVector", group = "Autonomus")
 public class Test_GuidedVectorField extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     private DcMotorEx RBM = null;
@@ -40,7 +37,7 @@ public class Test_GuidedVectorField extends LinearOpMode {
     Vector2D current_point = new Vector2D(0, 0);
     Pose2d curr_point = new Pose2d();
     GVFPathFollowing drive = new GVFPathFollowing();
-    Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
+    //Telemetry telemetry = FtcDashboard.getInstance().getTelemetry();
     private double curr_LeftEncPos = 0;
     private double curr_RightEncPos = 0;
     private double curr_MidEncPos = 0;
@@ -72,9 +69,9 @@ public class Test_GuidedVectorField extends LinearOpMode {
         rightEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "RFM"));
         midEnc = new Encoder(hardwareMap.get(DcMotorEx.class, "LBM"));
 
-        leftEnc.setDirection(Encoder.Direction.FORWARD);
+        leftEnc.setDirection(Encoder.Direction.REVERSE);
         rightEnc.setDirection(Encoder.Direction.FORWARD);
-        midEnc.setDirection(Encoder.Direction.FORWARD);
+        midEnc.setDirection(Encoder.Direction.REVERSE);
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         //START
@@ -92,22 +89,22 @@ public class Test_GuidedVectorField extends LinearOpMode {
         angle = 0;
         current_point = new Vector2D(0, 0);
         curr_point = new Pose2d(0, 0, 0);
-        Pose2d target_point = new Pose2d(traj.calculate(1).getX(), traj.calculate(1).getY(),traj.heading(1));
+        Pose2d target_point = new Pose2d(traj.calculate(1).getX(), traj.calculate(1).getY(), traj.heading(1));
         while (opModeIsActive()) {
             for (LynxModule hub : allHubs) {
                 hub.clearBulkCache();
             }
             updateOdometryPos();
-            Pose2d movVector = drive.calcGuidanceVector(traj, current_point,curr_point.getHeading());
+            Pose2d movVector = drive.calculateGuidanceVector(traj, current_point, curr_point.getHeading());
             Pose2d err = target_point.minus(curr_point);
-            if (err.getX() > 1 || err.getY() > 1 || Math.toDegrees(err.getHeading()) > 2)
-                setPowers(movVector, 0.7);
+            if (Math.abs(err.getX()) > 1 || Math.abs(err.getY()) > 1 || Math.abs(Math.toDegrees(err.getHeading())) > 2)
+                setPowers(movVector, 0.5);
             else
-                setPowers(movVector,0);
+                setPowers(movVector, 0);
             telemetry.addData("Heading final:", Math.toDegrees(traj.heading(1)));
-            telemetry.addData("Err OX:", err.getX());
-            telemetry.addData("Err OY:", err.getY());
-            telemetry.addData("Err rotire:", (err.getHeading()));
+            telemetry.addData("Vit OX:", movVector.getX());
+            telemetry.addData("Vit OY:", movVector.getY());
+            telemetry.addData("Vit rotire:", (movVector.getHeading()));
             TelemetryPos();
         }
     }
@@ -143,7 +140,7 @@ public class Test_GuidedVectorField extends LinearOpMode {
         angle += dtheta;
 
         current_point = new Vector2D(Pos_X, Pos_Y);
-        curr_point = new Pose2d(Pos_X,Pos_Y,angle);
+        curr_point = new Pose2d(Pos_X, Pos_Y, angle);
     }
 
     private void TelemetryPos() {
@@ -159,14 +156,19 @@ public class Test_GuidedVectorField extends LinearOpMode {
         double RBM_pow = mov.getX() - mov.getY() + mov.getHeading();
         double RFM_pow = mov.getX() + mov.getY() + mov.getHeading();
 
-        Range.clip(LFM_pow, -0.8, 0.8);
-        Range.clip(LBM_pow, -0.8, 0.8);
-        Range.clip(RFM_pow, -0.8, 0.8);
-        Range.clip(RBM_pow, -0.8, 0.8);
+        // Range.clip(LFM_pow, -0.8, 0.8);
+        // Range.clip(LBM_pow, -0.8, 0.8);
+        //Range.clip(RFM_pow, -0.8, 0.8);
+        // Range.clip(RBM_pow, -0.8, 0.8);
 
         LFM.setPower(LFM_pow * movementSpeed);
         RFM.setPower(RFM_pow * movementSpeed);
         LBM.setPower(LBM_pow * movementSpeed);
         RBM.setPower(RBM_pow * movementSpeed);
+
+        telemetry.addData("LFM power", LFM_pow * movementSpeed);
+        telemetry.addData("RFM power", RFM_pow * movementSpeed);
+        telemetry.addData("LBM power", LBM_pow * movementSpeed);
+        telemetry.addData("RBM power", RBM_pow * movementSpeed);
     }
 }
