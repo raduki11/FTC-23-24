@@ -18,9 +18,9 @@ public class Constants {
 
 
     //GoToPoint Constants ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    public static double kP_X = 0.01, kD_X = 0.005,
-            kP_Y = 0.01, kD_Y = 0.005,
-            kP_Headng = 0.8, kD_Heading = 0.007;
+    public static double kP_X = 0.35, kD_X = 0.03,
+            kP_Y = 0.35, kD_Y = 0.02,
+            kP_Headng = 0.5, kD_Heading = 0;
     //GoToPoint Constants ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 

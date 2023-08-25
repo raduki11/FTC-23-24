@@ -67,7 +67,7 @@ public class GVFPathFollowing {
         //long startTime = System.nanoTime();
         double minT = -1;
         double minDist = Double.POSITIVE_INFINITY;
-        int numOfPoints = 100;
+        int numOfPoints = 150;
         for (int i = 0; i <= numOfPoints; i++) {
             double t = (double) (i / (double) numOfPoints);
             double dist = calculateMinimizationFunction(curve, t, point);
